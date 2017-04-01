@@ -1,0 +1,14 @@
+(defproject clj-htmltopdf "0.1.0-SNAPSHOT"
+  :description  "Simple Clojure wrapper for Open HTML to PDF"
+  :url          "https://github.com/gered/clj-htmltopdf"
+  :license      {:name "GNU Lesser General Public License v3.0"
+                 :url  "https://www.gnu.org/licenses/lgpl.html"}
+
+  :dependencies [[com.openhtmltopdf/openhtmltopdf-core "0.0.1-RC9"]
+                 [com.openhtmltopdf/openhtmltopdf-jsoup-dom-converter "0.0.1-RC9"]
+                 [com.openhtmltopdf/openhtmltopdf-pdfbox "0.0.1-RC9"]
+                 [com.openhtmltopdf/openhtmltopdf-rtl-support "0.0.1-RC9"]
+                 [hiccup "1.0.5"]]
+
+  :profiles     {:provided
+                 {:dependencies [[org.clojure/clojure "1.8.0"]]}})
