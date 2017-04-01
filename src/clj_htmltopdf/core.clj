@@ -37,10 +37,18 @@
     (catch Exception ex
       (throw (Exception. "Error parsing input as HTML5." ex)))))
 
+(def default-options
+  {:logging?          false
+   :base-uri          ""
+   :include-base-css? true
+   :page              {:size        :letter
+                       :orientation :portrait}})
+
 (defn ->pdf
   [in out & [options]]
-  (let [builder  (PdfRendererBuilder.)
-        base-uri (str (or (:base-uri options) "."))
+  (let [options  (merge default-options options)
+        builder  (PdfRendererBuilder.)
+        base-uri (str (:base-uri options))
         html     (read-html in)
         html-doc (parse-html5 html)
         output   (->output-stream out)]
