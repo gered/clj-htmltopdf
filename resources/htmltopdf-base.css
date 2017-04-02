@@ -19,7 +19,7 @@ table {
 }
 table td, table th {
 	border: 1px solid #000;
-	padding: 0.01in 0.08in;
+	padding: 0.08em 0.5em;
 }
 table td {
 	vertical-align: top;
