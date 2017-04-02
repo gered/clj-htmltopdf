@@ -1,0 +1,50 @@
+body {
+	font: 12pt sans-serif;
+	line-height: 1.2;
+	background: #fff;
+	color: #000;
+}
+a {
+	page-break-inside: avoid;
+}
+blockquote {
+	page-break-inside: avoid;
+}
+h1, h2, h3, h4, h5, h6 {
+	page-break-after: avoid;
+	page-break-inside: avoid;
+}
+img {
+	page-break-after: avoid;
+	page-break-inside: avoid;
+}
+table {
+	page-break-inside: avoid;
+}
+tr {
+	page-break-inside: avoid;
+}
+pre {
+	page-break-inside: avoid;
+}
+ul {
+	page-break-before: avoid;
+}
+ol {
+	page-break-before: avoid;
+}
+dl {
+	page-break-before: avoid;
+}
+li {
+	page-break-inside: avoid;
+}
+.page-break-before {
+	page-break-before: always;
+}
+.page-break-after {
+	page-break-after: always;
+}
+.no-page-break-inside {
+	page-break-inside: avoid;
+}
