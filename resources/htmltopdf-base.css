@@ -13,10 +13,44 @@ img {
 	page-break-inside: avoid;
 }
 table {
+	width: 100%;
+	border: 1px solid #000;
+	border-collapse: collapse;
+}
+table td, table th {
+	border: 1px solid #000;
+	padding: 0.01in 0.08in;
+}
+table td {
+	vertical-align: top;
+}
+table th {
+	vertical-align: bottom;
+}
+table thead th {
+	background-color: #ddd;
+}
+table.borderless {
+	border: none;
+}
+table.borderless td, table.borderless th {
+	border: none;
+}
+table.borderless thead th {
+	background-color: inherit;
+}
+table.striped tbody tr:nth-child(odd) > td {
+	background-color: #f1f1f1;
+}
+table.no-split-rows tr {
+	page-break-inside: avoid;
+	page-break-after: auto;
+}
+table.keep-together {
 	page-break-inside: avoid;
 }
 tr {
-	page-break-inside: avoid;
+	page-break-inside: auto;
 }
 pre {
 	page-break-inside: avoid;
@@ -41,4 +75,13 @@ li {
 }
 .no-page-break-inside {
 	page-break-inside: avoid;
+}
+.text-left {
+	text-align: left;
+}
+.text-center {
+	text-align: center;
+}
+.text-right {
+	text-align: right;
 }
