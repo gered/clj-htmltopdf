@@ -92,18 +92,29 @@
   (if-not (string/blank? s)
     (str \" (string/replace s "\"" "\\\"") \")))
 
+(defn parse-margin-box-paging-content
+  [paging-content]
+  (->> paging-content
+       (map
+         #(case %
+            :page (str "counter(page)")
+            :pages (str "counter(pages)")
+            (str (sanitize-margin-box-text %))))
+       (string/join " ")))
+
 (defn ->page-margin-boxes-declaration-css
   [{:keys [margin-box] :as page-options}]
   (mapv
-    (fn [[box-name {:keys [text element content] :as box-properties}]]
+    (fn [[box-name {:keys [text element content paging] :as box-properties}]]
       [(str "@" (name box-name))
        (merge
          {:content
           (cond
             content content
             text    (sanitize-margin-box-text text)
-            element (str "element(" (name box-name) ")"))}
-         (dissoc box-properties :text :element :content))])
+            element (str "element(" (name box-name) ")")
+            paging  (parse-margin-box-paging-content (if (sequential? paging) paging [paging])))}
+         (dissoc box-properties :text :element :content :paging))])
     margin-box))
 
 (defn ->page-margin-boxes-running-element-css
