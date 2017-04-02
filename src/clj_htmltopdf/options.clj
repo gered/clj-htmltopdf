@@ -87,15 +87,48 @@
       :else
       [[:margin (str (or margin default-margin))]])))
 
+(defn sanitize-margin-box-text
+  [^String s]
+  (if-not (string/blank? s)
+    (str \" (string/replace s "\"" "\\\"") \")))
+
+(defn ->page-margin-boxes-declaration-css
+  [{:keys [margin-box] :as page-options}]
+  (mapv
+    (fn [[box-name {:keys [text element content] :as box-properties}]]
+      [(str "@" (name box-name))
+       (merge
+         {:content
+          (cond
+            content content
+            text    (sanitize-margin-box-text text)
+            element (str "element(" (name box-name) ")"))}
+         (dissoc box-properties :text :element :content))])
+    margin-box))
+
+(defn ->page-margin-boxes-running-element-css
+  [{:keys [margin-box] :as page-options}]
+  (->> margin-box
+       (filter #(:element (second %)))
+       (mapv
+         (fn [[box-name {:keys [element] :as box-properties}]]
+           [(str "#margin-box-" (name box-name)) {:position (str "running(" (name box-name) ")")}]))))
+
 (defn page-options->css
   [page-options]
   (let [page-options (merge (:page default-options) page-options)]
-    [["@page"
-      (->> (concat
-             (->page-size-css page-options)
-             (->page-margin-css page-options))
-           (remove #(nil? (second %)))
-           (reduce #(assoc %1 (first %2) (second %2)) {}))]]))
+    (vec
+      (concat
+        [(into
+           ["@page"
+            (->> (concat
+                   (->page-size-css page-options)
+                   (->page-margin-css page-options))
+                 (remove #(nil? (second %)))
+                 (reduce #(assoc %1 (first %2) (second %2)) {})
+                 (merge {:font-family "sans-serif"}))]
+           (->page-margin-boxes-declaration-css page-options))]
+        (->page-margin-boxes-running-element-css page-options)))))
 
 (defn append-stylesheet-link-tags!
   [^Element parent stylesheets]
