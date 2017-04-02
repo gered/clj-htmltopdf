@@ -127,6 +127,7 @@
 (defn build-and-append-base-css-styles!
   [^Element parent styles]
   (append-style-tag! parent (build-base-css-styles styles))
+  (append-css-link-tag! parent (io/resource "htmltopdf-base.css"))
   (if-let [additional-styles (:styles styles)]
     (cond
       (sequential? additional-styles) (append-stylesheet-link-tags! parent additional-styles)
