@@ -41,7 +41,7 @@
                     (reduce #(assoc %1 (first %2) (second %2)) {}))]
     [["@page" styles]]))
 
-(defn append-page-options-style-tag
+(defn append-page-options-style-tag!
   ^Element [^Element parent options]
   (let [styles  (-> (:page options)
                     (page-options->css)
@@ -50,17 +50,17 @@
     (.attr element "type" "text/css")
     (.text element styles)))
 
-(defn append-base-css-link-tag
+(defn append-base-css-link-tag!
   ^Element [^Element parent]
   (let [element (.appendElement parent "link")]
     (.attr element "type" "text/css")
     (.attr element "rel" "stylesheet")
     (.attr element "href" (str (io/resource "htmltopdf-base.css")))))
 
-(defn inject-options-into-html
+(defn inject-options-into-html!
   [^Document doc options]
   (let [base-uri (->base-uri options)
         head-tag (-> doc (.select "head") (.first))]
-    (append-page-options-style-tag head-tag options)
-    (if (:include-base-css? options) (append-base-css-link-tag head-tag))
+    (append-page-options-style-tag! head-tag options)
+    (if (:include-base-css? options) (append-base-css-link-tag! head-tag))
     doc))
