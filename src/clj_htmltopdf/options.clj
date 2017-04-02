@@ -68,6 +68,13 @@
   [{:keys [margin] :as page-options}]
   (let [default-margin (get-in default-options [:page :margin])]
     (cond
+      (keyword? margin)
+      (case margin
+        :normal   [[:margin default-margin]]
+        :narrow   [[:margin "0.5in"]]
+        :moderate [[:margin "1.0in 0.75in"]]
+        :wide     [[:margin "1.0in 2.0in"]])
+
       (map? margin)
       [[:margin-left (or (:left margin) default-margin)]
        [:margin-top (or (:top margin) default-margin)]
