@@ -66,8 +66,7 @@
 
 (defn inject-options-into-html!
   [^Document doc options]
-  (let [base-uri (->base-uri options)
-        head-tag (-> doc (.select "head") (.first))]
-    (append-page-options-style-tag! head-tag options)
+  (let [head-tag (-> doc (.select "head") (.first))]
+    (if (:page options) (append-page-options-style-tag! head-tag options))
     (if (:include-base-css? options) (append-base-css-link-tag! head-tag))
     doc))
