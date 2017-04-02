@@ -1,9 +1,3 @@
-body {
-	font: 12pt sans-serif;
-	line-height: 1.2;
-	background: #fff;
-	color: #000;
-}
 a {
 	page-break-inside: avoid;
 }
