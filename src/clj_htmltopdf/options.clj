@@ -24,6 +24,12 @@
     (.attr element "rel" "stylesheet")
     (.attr element "href" (str href))))
 
+(defn append-meta-tag!
+  ^Element [^Element parent name content]
+  (let [element (.appendElement parent "meta")]
+    (.attr element "name" (str name))
+    (.attr element "content" (str content))))
+
 (def default-options
   {:logging? false
    :base-uri ""
@@ -126,10 +132,19 @@
       (sequential? additional-styles) (append-stylesheet-link-tags! parent additional-styles)
       (string? additional-styles)     (append-stylesheet-link-tags! parent [additional-styles]))))
 
+(defn append-doc-meta-tags!
+  [^Element parent options]
+  (let [{:keys [author keywords subject title]} (:doc options)]
+    (if author (append-meta-tag! parent "author" author))
+    (if keywords (append-meta-tag! parent "keywords" keywords))
+    (if subject (append-meta-tag! parent "subject" subject))
+    (if title (append-meta-tag! parent "title" title))))
+
 (defn inject-options-into-html!
   [^Document doc options]
   (let [head-tag (-> doc (.select "head") (.first))
         styles   (:styles options)]
+    (if (:doc options) (append-doc-meta-tags! head-tag options))
     (if (:page options) (append-style-tag! head-tag (page-options->css (:page options))))
     (cond
       (sequential? styles)              (append-stylesheet-link-tags! head-tag styles)
