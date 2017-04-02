@@ -46,24 +46,43 @@
 (defn ->page-size-css
   [{:keys [size orientation] :as page-options}]
   (if (or size orientation)
-    (string/trim
-      (str
-        (cond
-          (keyword? size)    (name size)
-          (sequential? size) (string/join " " size)
-          :else              size)
-        " "
-        (if (keyword? orientation)
-          (name orientation)
-          orientation)))))
+    [[:size
+      (string/trim
+        (str
+          (cond
+            (keyword? size)    (name size)
+            (sequential? size) (string/join " " size)
+            :else              size)
+          " "
+          (if (keyword? orientation)
+            (name orientation)
+            orientation)))]]))
+
+(defn ->page-margin-css
+  [{:keys [margin] :as page-options}]
+  (let [default-margin (get-in default-options [:page :margin])]
+    (cond
+      (map? margin)
+      [[:margin-left (or (:left margin) default-margin)]
+       [:margin-top (or (:top margin) default-margin)]
+       [:margin-right (or (:right margin) default-margin)]
+       [:margin-bottom (or (:bottom margin) default-margin)]]
+
+      (sequential? margin)
+      [[:margin (string/join " " margin)]]
+
+      :else
+      [[:margin (str (or margin default-margin))]])))
 
 (defn page-options->css
   [page-options]
-  (let [styles (->> [[:size (->page-size-css page-options)]]
-                    (into [])
-                    (remove #(nil? (second %)))
-                    (reduce #(assoc %1 (first %2) (second %2)) {}))]
-    [["@page" styles]]))
+  (let [page-options (merge (:page default-options) page-options)]
+    [["@page"
+      (->> (concat
+             (->page-size-css page-options)
+             (->page-margin-css page-options))
+           (remove #(nil? (second %)))
+           (reduce #(assoc %1 (first %2) (second %2)) {}))]]))
 
 (defn append-stylesheet-link-tags!
   [^Element parent stylesheets]
