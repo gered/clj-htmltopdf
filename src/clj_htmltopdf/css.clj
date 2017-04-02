@@ -34,7 +34,7 @@
       (.append sb indent)
       (.append sb (css-rule-name-str names))
       (.append sb " {\n")
-      (doseq [[attr-name attr-value] attrs]
+      (doseq [[attr-name attr-value] (sort-by first attrs)]
         (when-let [attr-str (css-attr-str attr-name attr-value)]
           (.append sb attr-indent)
           (.append sb attr-str)

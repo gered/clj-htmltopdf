@@ -50,9 +50,9 @@
          (str (css-rule->str (StringBuilder.) [:p {}]))))
   (is (= "p {\n  font-weight: bold;\n}\n"
          (str (css-rule->str (StringBuilder.) [:p {:font-weight "bold"}]))))
-  (is (= "p {\n  font-weight: bold;\n  color: #000;\n}\n"
+  (is (= "p {\n  color: #000;\n  font-weight: bold;\n}\n"
          (str (css-rule->str (StringBuilder.) [:p {:font-weight "bold" :color "#000"}]))))
-  (is (= "@page {\n  size: 8.5in 11in;\n  margin: 10%;\n  @top-right {\n    content: \"Page \" counter(page);\n  }\n  @top-left {\n    content: \"Foobar\";\n    border: solid red;\n  }\n}\n"
+  (is (= "@page {\n  margin: 10%;\n  size: 8.5in 11in;\n  @top-right {\n    content: \"Page \" counter(page);\n  }\n  @top-left {\n    border: solid red;\n    content: \"Foobar\";\n  }\n}\n"
          (str (css-rule->str
                 (StringBuilder.)
                 ["@page"
@@ -91,7 +91,7 @@
               :color "black"}]
             [:p
              {:font-size "12pt"}]])))
-  (is (= "body {\n  background-color: white;\n  color: black;\n}\n@page {\n  size: 8.5in 11in;\n  margin: 10%;\n  @top-right {\n    content: \"Page \" counter(page);\n  }\n  @top-left {\n    content: \"Foobar\";\n    border: solid red;\n  }\n}\n"
+  (is (= "body {\n  background-color: white;\n  color: black;\n}\n@page {\n  margin: 10%;\n  size: 8.5in 11in;\n  @top-right {\n    content: \"Page \" counter(page);\n  }\n  @top-left {\n    border: solid red;\n    content: \"Foobar\";\n  }\n}\n"
          (css->str
            [[:body
              {:background-color "white"
