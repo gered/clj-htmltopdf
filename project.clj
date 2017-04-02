@@ -1,4 +1,4 @@
-(defproject clj-htmltopdf "0.1.0-SNAPSHOT"
+(defproject clj-htmltopdf "0.1-SNAPSHOT"
   :description  "Simple Clojure wrapper for Open HTML to PDF"
   :url          "https://github.com/gered/clj-htmltopdf"
   :license      {:name "GNU Lesser General Public License v3.0"
