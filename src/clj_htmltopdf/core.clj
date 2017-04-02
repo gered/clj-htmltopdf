@@ -1,13 +1,18 @@
 (ns clj-htmltopdf.core
   (:require
     [clojure.java.io :as io]
-    [hiccup.page :as h])
+    [clojure.string :as string]
+    [hiccup.page :as h]
+    [clj-htmltopdf.css :as css]
+    [clj-htmltopdf.options :as o])
   (:import
     [java.io OutputStream]
     [com.openhtmltopdf DOMBuilder]
     [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
     [com.openhtmltopdf.util XRLog]
-    [org.jsoup Jsoup]))
+    [org.jsoup Jsoup]
+    [org.jsoup.nodes Document Element]
+    [org.jsoup.parser Tag]))
 
 (defn- read-html
   [in]
@@ -29,35 +34,36 @@
     (catch Exception ex
       (throw (Exception. "Error preparing an OutputStream from output given." ex)))))
 
-(defn- parse-html5
+(defn- parse-jsoup-html
   [^String html]
   (try
-    (let [parsed-doc (Jsoup/parse html)]
-      (DOMBuilder/jsoup2DOM parsed-doc))
+    (Jsoup/parse html)
     (catch Exception ex
-      (throw (Exception. "Error parsing input as HTML5." ex)))))
+      (throw (Exception. "Error parsing input HTML to Jsoup Document." ex)))))
 
-(def default-options
-  {:logging?          false
-   :base-uri          ""
-   :include-base-css? true
-   :page              {:size        :letter
-                       :orientation :portrait}})
+(defn- set-jsoup-html-doc
+  [^PdfRendererBuilder builder jsoup-doc base-uri]
+  (try
+    (let [doc (DOMBuilder/jsoup2DOM jsoup-doc)]
+      (.withW3cDocument builder doc base-uri))
+    (catch Exception ex
+      (throw (Exception. "Error setting org.w3c.dom.Document HTML." ex)))))
 
 (defn ->pdf
   [in out & [options]]
-  (let [options  (merge default-options options)
+  (let [options  (merge o/default-options options)
         builder  (PdfRendererBuilder.)
-        base-uri (str (:base-uri options))
         html     (read-html in)
-        html-doc (parse-html5 html)
+        html-doc (parse-jsoup-html html)
+        html-doc (o/inject-options-into-html html-doc options)
         output   (->output-stream out)]
+    html-doc
     (if (:logging? options)
       (let [logger (:logger options)]
         (if logger (XRLog/setLoggerImpl logger))
         (XRLog/setLoggingEnabled true))
       (XRLog/setLoggingEnabled false))
-    (.withW3cDocument builder html-doc base-uri)
+    (set-jsoup-html-doc builder html-doc (o/->base-uri options))
     (with-open [os output]
       (.toStream builder os)
       (try
