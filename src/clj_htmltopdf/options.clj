@@ -15,6 +15,13 @@
                        :orientation :portrait
                        :margin      "1.0in"}})
 
+(defn get-final-options
+  [options]
+  (let [final-options (merge default-options options)]
+    (if (get-in final-options [:debug :display-options?])
+      (clojure.pprint/pprint final-options))
+    final-options))
+
 (defn ->base-uri
   [options]
   (str (:base-uri options)))

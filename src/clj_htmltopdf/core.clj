@@ -41,6 +41,8 @@
   (let [html     (read-html-string in)
         html-doc (Jsoup/parse html)]
     (o/inject-options-into-html! html-doc options)
+    (if (get-in options [:debug :display-html?])
+      (println (str html-doc)))
     html-doc))
 
 (defn write-pdf!
@@ -55,7 +57,7 @@
 
 (defn ->pdf
   [in out & [options]]
-  (let [options  (merge o/default-options options)
+  (let [options  (o/get-final-options options)
         html-doc (prepare-html in options)]
     (configure-logging! options)
     (write-pdf! html-doc (o/->base-uri options) out)))
