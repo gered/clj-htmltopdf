@@ -46,6 +46,12 @@ table.no-split-rows tr {
 	page-break-inside: avoid;
 	page-break-after: auto;
 }
+table.repeat-header {
+	-fs-table-paginate: paginate;
+	/* hack to work around bug http://stackoverflow.com/questions/10512324
+	   unfortunately, this does result in borders that are a little bit too thick */
+	border-spacing: 0;
+}
 table.keep-together {
 	page-break-inside: avoid;
 }
