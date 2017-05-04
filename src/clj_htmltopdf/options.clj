@@ -123,7 +123,7 @@
        (filter #(:element (second %)))
        (mapv
          (fn [[box-name {:keys [element] :as box-properties}]]
-           [(str "#margin-box-" (name box-name)) {:position (str "running(" (name box-name) ")")}]))))
+           [(str "#" element) {:position (str "running(" (name box-name) ")")}]))))
 
 (defn page-options->css
   [page-options]
