@@ -4,10 +4,14 @@
     [hiccup.page :as h]
     [clj-htmltopdf.options :as o])
   (:import
-    [java.io OutputStream]
+    [java.io InputStream OutputStream PipedInputStream PipedOutputStream]
     [com.openhtmltopdf DOMBuilder]
     [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
     [com.openhtmltopdf.util XRLog]
+    [org.apache.pdfbox.pdmodel PDDocument PDPage PDPageContentStream PDPageContentStream$AppendMode]
+    [org.apache.pdfbox.pdmodel.font PDType1Font]
+    [org.apache.pdfbox.pdmodel.graphics.state PDExtendedGraphicsState]
+    [org.apache.pdfbox.util Matrix]
     [org.jsoup Jsoup]
     [org.jsoup.nodes Document]))
 
@@ -46,18 +50,36 @@
     html-doc))
 
 (defn write-pdf!
-  [^Document html-doc ^String base-uri out]
-  (let [builder (PdfRendererBuilder.)
-        os      (->output-stream out)]
+  [^Document html-doc ^String base-uri]
+  (let [builder (PdfRendererBuilder.)]
     (.withW3cDocument builder (DOMBuilder/jsoup2DOM html-doc) base-uri)
-    (with-open [os os]
-      (.toStream builder os)
-      (.run builder)
-      os)))
+    (let [piped-in  (PipedInputStream.)
+          piped-out (PipedOutputStream. piped-in)]
+      (future
+        (with-open [os piped-out]
+          (.toStream builder os)
+          (.run builder)))
+      piped-in)))
+
+(defn write-watermark!
+  [^InputStream pdf ^OutputStream out {:keys [watermark] :as options}]
+  (with-open [doc (PDDocument/load pdf)]
+    (doseq [^PDPage page (.getPages doc)]
+      (let [cs (PDPageContentStream. doc page PDPageContentStream$AppendMode/APPEND true true)]
+        (with-open [cs cs]
+          (watermark page cs))))
+    (.save doc out)
+    out))
 
 (defn ->pdf
   [in out & [options]]
   (let [options  (o/get-final-options options)
         html-doc (prepare-html in options)]
     (configure-logging! options)
-    (write-pdf! html-doc (o/->base-uri options) out)))
+    (let [result (write-pdf! html-doc (o/->base-uri options))
+          out    (->output-stream out)]
+      (if (:watermark options)
+        (write-watermark! result out options)
+        (with-open [os out]
+          (io/copy result os)
+          os)))))
