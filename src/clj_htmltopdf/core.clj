@@ -2,6 +2,7 @@
   (:require
     [clojure.java.io :as io]
     [hiccup.page :as h]
+    [clj-htmltopdf.objects :as obj]
     [clj-htmltopdf.options :as o]
     [clj-htmltopdf.watermark :as w])
   (:import
@@ -45,15 +46,20 @@
     html-doc))
 
 (defn write-pdf!
-  ^InputStream [^Document html-doc ^String base-uri]
-  (let [builder (PdfRendererBuilder.)]
+  ^InputStream [^Document html-doc options]
+  (let [builder  (PdfRendererBuilder.)
+        base-uri (o/->base-uri options)]
+    (obj/set-object-drawer-factory builder options)
     (.withW3cDocument builder (DOMBuilder/jsoup2DOM html-doc) base-uri)
     (let [piped-in  (PipedInputStream.)
           piped-out (PipedOutputStream. piped-in)]
       (future
-        (with-open [os piped-out]
-          (.toStream builder os)
-          (.run builder)))
+        (try
+          (with-open [os piped-out]
+            (.toStream builder os)
+            (.run builder))
+          (catch Exception ex
+            (println "Exception while rendering PDF" ex))))
       piped-in)))
 
 (defn ->pdf
@@ -61,7 +67,7 @@
   (let [options  (o/get-final-options options)
         html-doc (prepare-html in options)]
     (configure-logging! options)
-    (let [pdf (write-pdf! html-doc (o/->base-uri options))
+    (let [pdf (write-pdf! html-doc options)
           out (->output-stream out)]
       (if (:watermark options)
         (w/write-watermark! pdf out options)
