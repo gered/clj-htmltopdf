@@ -33,8 +33,6 @@
       (if-let [logger (:logger options)]
         (XRLog/setLoggerImpl logger))
       (XRLog/setLoggingEnabled true))
-    ; NOTE: a bug in how Open HTML to PDF's XRLog class initializes itself will always result
-    ; in an initial little bit of logging output regardless of when we set this to false.
     (XRLog/setLoggingEnabled false)))
 
 (defn prepare-html
