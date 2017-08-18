@@ -16,7 +16,7 @@
     [org.jsoup Jsoup]
     [org.jsoup.nodes Document]))
 
-(defn ->inline-image
+(defn embed-image
   "Reads an image file and encodes it as a base64 string suitable for use in a data url for displaying
    inline images in <img> tags or for use in CSS."
   [image-file]
