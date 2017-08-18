@@ -3,15 +3,35 @@
     [clojure.java.io :as io]
     [hiccup.page :as h]
     [clj-htmltopdf.objects :as obj]
-    [clj-htmltopdf.options :as o]
-    [clj-htmltopdf.watermark :as w])
+    [clj-htmltopdf.options :as opt]
+    [clj-htmltopdf.watermark :as w]
+    [clj-htmltopdf.utils :as u])
   (:import
     [java.io InputStream OutputStream PipedInputStream PipedOutputStream]
+    [java.net URLConnection]
+    [java.util Base64]
     [com.openhtmltopdf DOMBuilder]
     [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
     [com.openhtmltopdf.util XRLog]
     [org.jsoup Jsoup]
     [org.jsoup.nodes Document]))
+
+(defn ->inline-image
+  [image-file]
+  (try
+    (let [image-file  (io/file image-file)
+          is          (io/input-stream image-file)
+          mime-type   (URLConnection/guessContentTypeFromStream is)
+          image-bytes (byte-array (.length image-file))]
+      (with-open [is is]
+        (.reset is)
+        (.read is image-bytes))
+      (let [b64-str (.encodeToString (Base64/getEncoder) image-bytes)]
+        (if (nil? mime-type)
+          (str "data:" b64-str)
+          (str "data:" mime-type ";base64," b64-str))))
+    (catch Exception ex
+      (throw (Exception. (str "Exception converting image to inline base64 string: " image-file) ex)))))
 
 (defn- read-html-string
   ^String [in]
@@ -40,7 +60,7 @@
   [in options]
   (let [html     (read-html-string in)
         html-doc (Jsoup/parse html)]
-    (o/inject-options-into-html! html-doc options)
+    (opt/inject-options-into-html! html-doc options)
     (if (get-in options [:debug :display-html?])
       (println (str html-doc)))
     html-doc))
@@ -48,7 +68,7 @@
 (defn write-pdf!
   [^Document html-doc options]
   (let [builder  (PdfRendererBuilder.)
-        base-uri (o/->base-uri options)]
+        base-uri (opt/->base-uri options)]
     (obj/set-object-drawer-factory builder options)
     (.withW3cDocument builder (DOMBuilder/jsoup2DOM html-doc) base-uri)
     (let [piped-in  (PipedInputStream.)
@@ -65,7 +85,7 @@
 
 (defn ->pdf
   [in out & [options]]
-  (let [options  (o/get-final-options options)
+  (let [options  (opt/get-final-options options)
         html-doc (prepare-html in options)]
     (configure-logging! options)
     (let [{:keys [pdf renderer]} (write-pdf! html-doc options)
