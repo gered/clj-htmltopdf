@@ -8,6 +8,7 @@
                  [com.openhtmltopdf/openhtmltopdf-jsoup-dom-converter "0.0.1-RC11"]
                  [com.openhtmltopdf/openhtmltopdf-pdfbox "0.0.1-RC11"]
                  [com.openhtmltopdf/openhtmltopdf-rtl-support "0.0.1-RC11"]
+                 [com.openhtmltopdf/openhtmltopdf-svg-support "0.0.1-RC11"]
                  [hiccup "1.0.5"]]
 
   :profiles     {:provided

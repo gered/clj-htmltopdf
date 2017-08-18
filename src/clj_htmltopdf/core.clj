@@ -12,6 +12,7 @@
     [java.util Base64]
     [com.openhtmltopdf DOMBuilder]
     [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
+    [com.openhtmltopdf.svgsupport BatikSVGDrawer]
     [com.openhtmltopdf.util XRLog]
     [org.jsoup Jsoup]
     [org.jsoup.nodes Document]))
@@ -72,6 +73,7 @@
   (let [builder  (PdfRendererBuilder.)
         base-uri (opt/->base-uri options)]
     (obj/set-object-drawer-factory builder options)
+    (.useSVGDrawer builder (BatikSVGDrawer.))
     (.withW3cDocument builder (DOMBuilder/jsoup2DOM html-doc) base-uri)
     (let [piped-in  (PipedInputStream.)
           piped-out (PipedOutputStream. piped-in)
