@@ -46,31 +46,38 @@
     html-doc))
 
 (defn write-pdf!
-  ^InputStream [^Document html-doc options]
+  [^Document html-doc options]
   (let [builder  (PdfRendererBuilder.)
         base-uri (o/->base-uri options)]
     (obj/set-object-drawer-factory builder options)
     (.withW3cDocument builder (DOMBuilder/jsoup2DOM html-doc) base-uri)
     (let [piped-in  (PipedInputStream.)
-          piped-out (PipedOutputStream. piped-in)]
-      (future
-        (try
-          (with-open [os piped-out]
-            (.toStream builder os)
-            (.run builder))
-          (catch Exception ex
-            (println "Exception while rendering PDF" ex))))
-      piped-in)))
+          piped-out (PipedOutputStream. piped-in)
+          renderer  (future
+                      (try
+                        (with-open [os piped-out]
+                          (.toStream builder os)
+                          (.run builder))
+                        (catch Exception ex
+                          (throw (Exception. "Exception while rendering PDF" ex)))))]
+      {:pdf      piped-in
+       :renderer renderer})))
 
 (defn ->pdf
   [in out & [options]]
   (let [options  (o/get-final-options options)
         html-doc (prepare-html in options)]
     (configure-logging! options)
-    (let [pdf (write-pdf! html-doc options)
-          out (->output-stream out)]
-      (if (:watermark options)
-        (w/write-watermark! pdf out options)
-        (with-open [os out]
-          (io/copy pdf os)
-          os)))))
+    (let [{:keys [pdf renderer]} (write-pdf! html-doc options)
+          out    (->output-stream out)
+          result (if (:watermark options)
+                   (w/write-watermark! pdf out options)
+                   (with-open [os out]
+                     (io/copy pdf os)
+                     os))]
+      ; this is a little weird, but because of the whole piped stream thing in write-pdf!, we need to render the
+      ; PDF in a future. if something throws an exception during rendering, it would otherwise get eaten silently by
+      ; the future... except if we deref the future! thus the explicit call to deref it here
+      (deref renderer)
+      result)))
+
