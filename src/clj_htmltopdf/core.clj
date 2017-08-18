@@ -17,6 +17,8 @@
     [org.jsoup.nodes Document]))
 
 (defn ->inline-image
+  "Reads an image file and encodes it as a base64 string suitable for use in a data url for displaying
+   inline images in <img> tags or for use in CSS."
   [image-file]
   (try
     (let [image-file  (io/file image-file)
@@ -47,7 +49,7 @@
     out
     (io/output-stream out)))
 
-(defn configure-logging!
+(defn- configure-logging!
   [options]
   (if (:logging? options)
     (do
@@ -56,7 +58,7 @@
       (XRLog/setLoggingEnabled true))
     (XRLog/setLoggingEnabled false)))
 
-(defn prepare-html
+(defn- prepare-html
   [in options]
   (let [html     (read-html-string in)
         html-doc (Jsoup/parse html)]
@@ -65,7 +67,7 @@
       (println (str html-doc)))
     html-doc))
 
-(defn write-pdf!
+(defn- write-pdf!
   [^Document html-doc options]
   (let [builder  (PdfRendererBuilder.)
         base-uri (opt/->base-uri options)]
@@ -84,6 +86,10 @@
        :renderer renderer})))
 
 (defn ->pdf
+  "Renders HTML to a PDF document. The HTML to be rendered is provided via the 'in' argument which can be provided as a
+   file, string, or Hiccup-style HTML. The PDF will be output to the 'out' argument which will be coerced to an
+   OutputStream (via clojure.java.io/output-stream). The resulting OutputBuffer is also returned when rendering has
+   finished."
   [in out & [options]]
   (let [options  (opt/get-final-options options)
         html-doc (prepare-html in options)]
