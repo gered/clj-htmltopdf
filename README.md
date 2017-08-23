@@ -182,12 +182,13 @@ object by providing custom functions under the `:objects` key in your options.
 {; ...
  ; other options
  ; ...
- :objects {:by-id {"my-object" (fn [^java.awt.Graphics2D g]
+ :objects {:by-id {"my-object" (fn [element-attrs ^java.awt.Graphics2D g]
                                  ; your custom rendering here
                                  )}}}
 ```
 
-This sets up an object renderer for the `<object>` element with id `my-object`.
+This sets up an object renderer for the `<object>` element with id `my-object`. The first argument is a map containing
+all of the `<object>` element's attributes.
 
 Note that with Open HTML to PDF, `<object>` tags have no default dimensions, so you should always make sure to include
 a bit of CSS to give them some size so that they will be rendered. For example:
