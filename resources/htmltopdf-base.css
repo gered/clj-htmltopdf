@@ -91,9 +91,9 @@ li {
 .text-right {
 	text-align: right;
 }
-#pdf-page-number:before {
+.page-number:before {
 	content: counter(page);
 }
-#pdf-page-count:before {
+.page-count:before {
 	content: counter(pages);
 }
