@@ -52,9 +52,6 @@ table.repeat-header {
 	   unfortunately, this does result in borders that are a little bit too thick */
 	border-spacing: 0;
 }
-table.keep-together {
-	page-break-inside: avoid;
-}
 tr {
 	page-break-inside: auto;
 }
@@ -73,14 +70,14 @@ dl {
 li {
 	page-break-inside: avoid;
 }
+.keep-together {
+	page-break-inside: avoid;
+}
 .page-break-before {
 	page-break-before: always;
 }
 .page-break-after {
 	page-break-after: always;
-}
-.no-page-break-inside {
-	page-break-inside: avoid;
 }
 .text-left {
 	text-align: left;
