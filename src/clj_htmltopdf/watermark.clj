@@ -2,13 +2,31 @@
   (:require
     [clojure.java.io :as io])
   (:import
-    [java.io InputStream OutputStream]
+    [java.io File InputStream OutputStream]
     [org.apache.pdfbox.pdmodel PDDocument PDPage PDPageContentStream PDPageContentStream$AppendMode]
     [org.apache.pdfbox.pdmodel.common PDRectangle]
     [org.apache.pdfbox.pdmodel.font PDType1Font PDFont]
     [org.apache.pdfbox.pdmodel.graphics.image PDImageXObject PDImage]
     [org.apache.pdfbox.pdmodel.graphics.state PDExtendedGraphicsState]
     [org.apache.pdfbox.util Matrix]))
+
+(declare ^:dynamic *pdf-images*)
+
+(defn create-pdf-image
+  "Creates an XObject image from an image file. Caches this XObject for this particular PDF document so that if the
+   image is rendered into the PDF multiple times, the PDF will reference the same image instead of creating duplicates
+   (which would potentially bump up the file size drastically).
+   This function must only be called from within code invoked by write-watermark!."
+  ^PDImageXObject [file ^PDDocument doc]
+  (if-not *pdf-images*
+    (throw (ex-info "Could not create PDF XObject image. Image cache has not been initialized." {:file file})))
+  (let [image-file (io/file file)
+        path       (.getPath image-file)]
+    (if-let [existing-image (get @*pdf-images* path)]
+      existing-image
+      (let [image (PDImageXObject/createFromFileByContent image-file doc)]
+        (swap! *pdf-images* assoc path image)
+        image))))
 
 ; TODO: this is a temporary measure to allow at least _some_ font customizability for watermarks
 ;       until something more comprehensive can be implemented such as allowing loading of external
@@ -59,7 +77,7 @@
 
 (defn render-image-watermark!
   [^PDDocument doc ^PDPage page ^PDPageContentStream cs options]
-  (let [image        (PDImageXObject/createFromFileByContent (io/file (:image options)) doc)
+  (let [image        (create-pdf-image (:image options) doc)
         image-width  (.getWidth image)
         image-height (.getHeight image)
         rotation     (float (or (:rotation options) 0))
@@ -90,11 +108,12 @@
 (defn write-watermark!
   [^InputStream pdf ^OutputStream out {:keys [watermark] :as options}]
   (with-open [doc (PDDocument/load pdf)]
-    (doseq [^PDPage page (.getPages doc)]
-      (let [cs (PDPageContentStream. doc page PDPageContentStream$AppendMode/APPEND true true)]
-        (with-open [cs cs]
-          (if (map? watermark)
-            (render-watermark! doc page cs watermark)
-            (watermark doc page cs)))))
+    (binding [*pdf-images* (atom {})]
+      (doseq [^PDPage page (.getPages doc)]
+        (let [cs (PDPageContentStream. doc page PDPageContentStream$AppendMode/APPEND true true)]
+          (with-open [cs cs]
+            (if (map? watermark)
+              (render-watermark! doc page cs watermark)
+              (watermark doc page cs))))))
     (.save doc out)
     out))
