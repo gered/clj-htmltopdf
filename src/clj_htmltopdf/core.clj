@@ -87,10 +87,14 @@
        :renderer renderer})))
 
 (defn ->pdf
-  "Renders HTML to a PDF document. The HTML to be rendered is provided via the 'in' argument which can be provided as a
-   file, string, or Hiccup-style HTML. The PDF will be output to the 'out' argument which will be coerced to an
-   OutputStream (via clojure.java.io/output-stream). The resulting OutputBuffer is also returned when rendering has
-   finished."
+  "Renders HTML to a PDF document.
+
+    in      - HTML to be rendered, provided as: File or InputStream object for an html file, string containing HTML, or
+              Hiccup-style HTML
+    out     - where to save the PDF to: PDF filename, or an OutputStream
+    options - optional map of options to control PDF document styling and other properties
+
+   Returns the OutputStream that the PDF was rendered to."
   [in out & [options]]
   (let [options  (opt/get-final-options options)
         html-doc (prepare-html in options)]
