@@ -14,27 +14,26 @@
     [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
     [com.openhtmltopdf.svgsupport BatikSVGDrawer]
     [com.openhtmltopdf.util XRLog]
+    [org.apache.commons.io IOUtils]
     [org.jsoup Jsoup]
     [org.jsoup.nodes Document]))
 
 (defn embed-image
-  "Reads an image file and encodes it as a base64 string suitable for use in a data url for displaying
-   inline images in <img> tags or for use in CSS."
-  [image-file]
+  "Reads an image (provided as a filename, InputStream or byte array) and encodes it as a base64 string suitable for
+   use in a data url for displaying inline images in <img> tags or for use in CSS."
+  [image]
   (try
-    (let [image-file  (io/file image-file)
-          is          (io/input-stream image-file)
+    (let [is          (if-not (instance? InputStream image)
+                        (io/input-stream image)
+                        image)
           mime-type   (URLConnection/guessContentTypeFromStream is)
-          image-bytes (byte-array (.length image-file))]
-      (with-open [is is]
-        (.reset is)
-        (.read is image-bytes))
+          image-bytes (if (u/byte-array? image) image (IOUtils/toByteArray ^InputStream is))]
       (let [b64-str (.encodeToString (Base64/getEncoder) image-bytes)]
         (if (nil? mime-type)
           (str "data:" b64-str)
           (str "data:" mime-type ";base64," b64-str))))
     (catch Exception ex
-      (throw (Exception. (str "Exception converting image to inline base64 string: " image-file) ex)))))
+      (throw (ex-info "Exception converting image to inline base64 string: " {:image image} ex)))))
 
 (defn- read-html-string
   ^String [in]
