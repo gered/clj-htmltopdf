@@ -46,7 +46,7 @@
     final-options))
 
 (defn ->base-uri
-  [options]
+  ^String [options]
   (str (:base-uri options)))
 
 (defn ->page-size-css

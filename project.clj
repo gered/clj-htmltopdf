@@ -5,10 +5,10 @@
                  :url  "https://www.gnu.org/licenses/lgpl.html"}
 
   :dependencies [[com.openhtmltopdf/openhtmltopdf-core "0.0.1-RC13"]
-                 [com.openhtmltopdf/openhtmltopdf-jsoup-dom-converter "0.0.1-RC13"]
                  [com.openhtmltopdf/openhtmltopdf-pdfbox "0.0.1-RC13"]
                  [com.openhtmltopdf/openhtmltopdf-rtl-support "0.0.1-RC13"]
                  [com.openhtmltopdf/openhtmltopdf-svg-support "0.0.1-RC13"]
+                 [org.jsoup/jsoup "1.11.3"]
                  [commons-io/commons-io "2.5"]
                  [hiccup "1.0.5"]]
 

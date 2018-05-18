@@ -10,13 +10,14 @@
     [java.io InputStream OutputStream PipedInputStream PipedOutputStream]
     [java.net URLConnection]
     [java.util Base64]
-    [com.openhtmltopdf DOMBuilder]
     [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
     [com.openhtmltopdf.svgsupport BatikSVGDrawer]
     [com.openhtmltopdf.util XRLog]
     [org.apache.commons.io IOUtils]
     [org.jsoup Jsoup]
-    [org.jsoup.nodes Document]))
+    [org.jsoup.helper W3CDom]
+    [org.jsoup.nodes Document]
+    [org.jsoup.parser HtmlTreeBuilder Parser ParseSettings]))
 
 (defn embed-image
   "Reads an image (provided as a filename, InputStream or byte array) and encodes it as a base64 string suitable for
@@ -58,10 +59,23 @@
       (XRLog/setLoggingEnabled true))
     (XRLog/setLoggingEnabled false)))
 
+(defn- ->jsoup-parser
+  ^Parser []
+  (doto
+    (Parser/htmlParser)
+    (.settings ParseSettings/preserveCase)))
+
+(defn- jsoup->w3c
+  ^org.w3c.dom.Document [^Document jsoup-doc]
+  (let [converter (W3CDom.)]
+    (.fromJsoup converter jsoup-doc)))
+
 (defn- prepare-html
   [in options]
-  (let [html     (read-html-string in)
-        html-doc (Jsoup/parse html)]
+  (let [base-uri (opt/->base-uri options)
+        html     (read-html-string in)
+        parser   (->jsoup-parser)
+        html-doc (Jsoup/parse html base-uri parser)]
     (opt/inject-options-into-html! html-doc options)
     (if (get-in options [:debug :display-html?])
       (println (str html-doc)))
@@ -70,10 +84,11 @@
 (defn- write-pdf!
   [^Document html-doc options]
   (let [builder  (PdfRendererBuilder.)
-        base-uri (opt/->base-uri options)]
+        base-uri (opt/->base-uri options)
+        w3c-doc  (jsoup->w3c html-doc)]
     (obj/set-object-drawer-factory builder options)
     (.useSVGDrawer builder (BatikSVGDrawer.))
-    (.withW3cDocument builder (DOMBuilder/jsoup2DOM html-doc) base-uri)
+    (.withW3cDocument builder w3c-doc base-uri)
     (let [piped-in  (PipedInputStream.)
           piped-out (PipedOutputStream. piped-in)
           renderer  (future
