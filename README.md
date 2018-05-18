@@ -200,6 +200,41 @@ a bit of CSS to give them some size so that they will be rendered. For example:
 ### Some More Examples:
 
 ```clojure
+; <object> renderer support
+(->pdf
+  [:div
+   [:h2 "Object Drawing Test"]
+   [:object {:id "the-object" :style "width: 400px; height: 300px;"}]
+   [:p "Text after the object"]]
+  "object.pdf"
+  {:objects
+   {:by-id
+    {"the-object"
+     (fn [object-element-attrs ^java.awt.Graphics2D g]
+       (.setColor g java.awt.Color/RED)
+       (.drawRect g 50 50 200 200)
+       (.setColor g java.awt.Color/BLUE)
+       (.drawRect g 75 75 300 200))}}})
+
+; SVG support
+(->pdf
+  [:div
+   [:h2 "SVG test"]
+   [:svg {:xmlns "http://www.w3.org/2000/svg" :version "1.1"}
+    [:rect {:x 25 :y 25 :width 200 :height 200 :fill "lime" :stroke-width 4 :stroke "pink"}]
+    [:circle {:cx 125 :cy 125 :r 75 :fill "orange"}]
+    [:polyline {:points "50,150 50,200 200,200 200,100" :stroke "red" :stroke-width 4 :fill "none"}]
+    [:line {:x1 50 :y1 50 :x2 200 :y2 200 :stroke "blue" :stroke-width 4}]]
+   [:hr]
+   [:svg {:xmlns "http://www.w3.org/2000/svg" :width 100 :height 100}
+    [:circle {:cx 50 :cy 50 :r 40 :stroke "green" :stroke-width 4 :fill "yellow"}]]
+   [:hr]
+   [:svg {:xmlns "http://www.w3.org/2000/svg" :width 300 :height 200}
+    [:rect {:width "100%" :height "100%" :fill "red"}]
+    [:circle {:cx 150 :cy 100 :r 80 :fill "green"}]
+    [:text {:x 150 :y 125 :font-size 60 :text-anchor "middle" :fill "white"} "SVG"]]]
+  "svg.pdf")
+
 ; disables automatically injected base styles and @page settings. this allows your html to specify completely custom
 ; styles and page properties if needed.
 (->pdf 

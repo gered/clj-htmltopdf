@@ -126,4 +126,3 @@
       ; the future... except if we deref the future! thus the explicit call to deref it here
       (deref renderer)
       result)))
-
