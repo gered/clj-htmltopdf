@@ -8,6 +8,14 @@
     [org.jsoup.nodes Document Element]
     [org.jsoup.parser Tag]))
 
+(defn- get-base-resource-path-url
+  []
+  (if-let [css-resource (io/resource "htmltopdf-base.css")]
+    (-> (io/file css-resource)
+        (.getParentFile)
+        (.toURL))
+    ""))
+
 (defn append-style-tag!
   ^Element [^Element parent css-styles]
   (let [element (.appendElement parent "style")]
@@ -32,7 +40,7 @@
 
 (def default-options
   {:logging? false
-   :base-uri ""
+   :base-uri (get-base-resource-path-url)
    :styles   true
    :page     {:size        :letter
               :orientation :portrait
