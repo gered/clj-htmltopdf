@@ -13,7 +13,7 @@
                  [hiccup "1.0.5"]]
 
   :profiles     {:provided
-                 {:dependencies [[org.clojure/clojure "1.8.0"]]}
+                 {:dependencies [[org.clojure/clojure "1.9.0"]]}
 
                  :dev
                  {:dependencies [[pjstadig/humane-test-output "0.8.1"]]
