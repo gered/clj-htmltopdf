@@ -41,7 +41,7 @@
           (if-let [f (get-in options [:objects :by-id element-id])]
             (->object-drawer-by-id f)))))))
 
-(defn set-object-drawer-factory
+(defn set-object-drawer-factory!
   [^PdfRendererBuilder builder options]
   (let [factory (->object-drawer-by-id-factory options)]
     (.useObjectDrawerFactory builder factory)))

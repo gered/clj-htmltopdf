@@ -87,7 +87,7 @@
         base-uri (opt/->base-uri options)
         w3c-doc  (jsoup->w3c html-doc)]
     (opt/set-uri-resolver! builder options)
-    (obj/set-object-drawer-factory builder options)
+    (obj/set-object-drawer-factory! builder options)
     (.useSVGDrawer builder (BatikSVGDrawer.))
     (.withW3cDocument builder w3c-doc base-uri)
     (let [piped-in  (PipedInputStream.)
