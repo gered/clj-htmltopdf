@@ -1,6 +1,7 @@
 (ns clj-htmltopdf.options
   (:require
     [clojure.java.io :as io]
+    [clojure.pprint :as pprint]
     [clojure.string :as string]
     [clj-htmltopdf.css :as css]
     [clj-htmltopdf.utils :as utils])
@@ -85,7 +86,7 @@
   [options]
   (let [final-options (merge default-options options)]
     (if (get-in final-options [:debug :display-options?])
-      (clojure.pprint/pprint final-options))
+      (pprint/pprint final-options))
     final-options))
 
 (defn ->base-uri
