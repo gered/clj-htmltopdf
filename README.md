@@ -173,7 +173,7 @@ The `cs` instance of a
 [`PDPageContentStream`](https://pdfbox.apache.org/docs/2.0.5/javadocs/org/apache/pdfbox/pdmodel/PDPageContentStream.html) 
 object contains a bunch of methods that can be used to render onto the current page.
 
-`:objects`
+#### `:objects`
 
 You can include `<object>` elements in your HTML and implement completely custom rendering for them using a `Graphics2D`
 object by providing custom functions under the `:objects` key in your options.
@@ -197,6 +197,76 @@ a bit of CSS to give them some size so that they will be rendered. For example:
 <object id="my-object" style="width: 200px; height: 200px;"></object>
 ```
 
+#### `:debug`
+
+Two options are currently available under here that can be useful to troubleshoot issues if your PDF is not rendering
+as you would expect.
+
+Setting `:display-html?` to true will cause `->pdf` to display the final HTML string (via stdout) that is being
+rendered (the final HTML _after_ all of the fancy options `<style>` tag injections and whatnot are completed).
+
+Setting `:display-options?` to true will cause `->pdf` to display the final merged options map (which includes the
+default values if not overridden) that is being used.
+
+#### `:logging?`
+
+Setting `:logging?` to true enables Open HTML to PDF's logging output. This is currently disabled by default because I
+found it to be a bit too chatty personally. But you may decide to enable this, especially during development as it can
+help you see when you've run into problems with your PDF. For example, it will display warnings when you have invalid
+URLs to things like images, CSS files, etc.
+
+#### File path / URL Resolving
+
+clj-htmltopdf is now configured (as of `0.1-alpha6` and later) to allow you to use relative URLs for things like `<img>`
+tags and CSS files to point to resources that exist on the classpath (e.g. under your project's "resources" directory).
+
+This means you should be able to do something like:
+
+```clojure
+(->pdf
+  [:div [:img {:src "images/foo.png"}]]
+  "relative-image-test.pdf")
+```
+ 
+Assuming the image `foo.png` was located in your project under `resources/images/foo.png` you should get a PDF with the
+image displayed as you would expect.
+ 
+The URI resolver that clj-htmltopdf uses by default will just use `clojure.java.io/resource` to resolve relative URI by
+default. You can also use absolute URIs if you wish, but they **must** include a scheme prefix (e.g. 'file:' or 'http:'
+or whatever else) or it will be assumed to be a relative file URI.
+ 
+```clojure
+; proper way of specifying an absolute file path URI
+[:img {:src "file:/Users/gered/Pictures/foo.png"}]
+ 
+; incorrect way! this will NOT work (it will be assumed to be a relative path)
+[:img {:src "/Users/gered/Pictures/foo.png"}]
+```
+
+If you wish you can set a "base URI" in the options map provided to `->pdf`:
+
+```clojure
+(->pdf
+  [:div [:img {:src "foo.png"}]]
+  "test.pdf"
+  {:base-uri "images/"})
+```
+
+The `:base-uri` option does not just apply to `<img>` tags of course, but to any URL that needs to be resolved to render
+the HTML as a PDF, so be careful if you use this option.
+
+For more advanced requirements, you can also set a custom URI resolver function:
+
+```clojure
+(->pdf
+  ...
+  "test.pdf"
+  {:uri-resolver (fn [base-uri uri]
+                   ; return a resolved string uri
+                   )})
+```
+
+ 
 ### Some More Examples:
 
 ```clojure
