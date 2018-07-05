@@ -2,11 +2,10 @@
   (:require
     [clojure.java.io :as io])
   (:import
-    [java.io File InputStream OutputStream]
+    [java.io InputStream OutputStream]
     [org.apache.pdfbox.pdmodel PDDocument PDPage PDPageContentStream PDPageContentStream$AppendMode]
-    [org.apache.pdfbox.pdmodel.common PDRectangle]
     [org.apache.pdfbox.pdmodel.font PDType1Font PDFont]
-    [org.apache.pdfbox.pdmodel.graphics.image PDImageXObject PDImage]
+    [org.apache.pdfbox.pdmodel.graphics.image PDImageXObject]
     [org.apache.pdfbox.pdmodel.graphics.state PDExtendedGraphicsState]
     [org.apache.pdfbox.util Matrix]))
 

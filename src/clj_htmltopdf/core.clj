@@ -17,7 +17,7 @@
     [org.jsoup Jsoup]
     [org.jsoup.helper W3CDom]
     [org.jsoup.nodes Document]
-    [org.jsoup.parser HtmlTreeBuilder Parser ParseSettings]))
+    [org.jsoup.parser Parser ParseSettings]))
 
 (defn embed-image
   "Reads an image (provided as a filename, InputStream or byte array) and encodes it as a base64 string suitable for

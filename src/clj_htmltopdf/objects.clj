@@ -1,10 +1,8 @@
 (ns clj-htmltopdf.objects
-  (:require
-    [clojure.string :as string])
   (:import
     [com.openhtmltopdf.extend FSObjectDrawer FSObjectDrawerFactory OutputDevice OutputDeviceGraphicsDrawer]
     [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
-    [org.w3c.dom Element NamedNodeMap]))
+    [org.w3c.dom Element]))
 
 (defn element-attrs->map
   [^Element element]
