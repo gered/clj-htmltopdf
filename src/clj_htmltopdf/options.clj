@@ -5,16 +5,51 @@
     [clj-htmltopdf.css :as css]
     [clj-htmltopdf.utils :as utils])
   (:import
-    [org.jsoup.nodes Document Element]
-    [org.jsoup.parser Tag]))
+    [java.net URI URL]
+    [com.openhtmltopdf.extend FSUriResolver]
+    [com.openhtmltopdf.pdfboxout PdfRendererBuilder]
+    [org.jsoup.nodes Document Element]))
 
-(defn- get-base-resource-path-url
-  []
-  (if-let [css-resource (io/resource "htmltopdf-base.css")]
-    (-> (io/file css-resource)
-        (.getParentFile)
-        (.toURL))
-    ""))
+(defn ->uri-resolver
+  ^FSUriResolver [f]
+  (reify FSUriResolver
+    (^String resolveURI [_ ^String base-uri ^String uri]
+      (f base-uri uri))))
+
+(defn resolve-uri
+  "default URI resolver. if the combination of base-uri + uri is found to be an absolute URI, then that
+   absolute URI is returned. if the uri itself is an absolute URI, then base-uri is not used at all.
+   otherwise, the relative URI (again, the combination of base-uri and uri) is resolved as a resource
+   URL via clojure.java.io/resource.
+
+   because java.net.URI defines an 'absolute URI' as a URI that includes a scheme (e.g. http:// or file://),
+   if you want to use an absolute path to a file on disk, you MUST prefix your uri with 'file:' else it will
+   be treated as a relative URI and resolved via clojure.java.io/resource (likely resulting in a nil return)"
+  ^String [^String base-uri ^String uri]
+  (if-not (string/blank? uri)
+    (let [possibly-relative-uri      (URI. uri)
+          possibly-relative-base-uri (if-not (string/blank? base-uri)
+                                       (URI. base-uri))]
+      (cond
+        (.isAbsolute possibly-relative-uri)
+        (str possibly-relative-uri)
+
+        (and possibly-relative-base-uri
+             (.isAbsolute possibly-relative-base-uri))
+        (str (URL. base-uri) uri)
+
+        :else
+        (let [relative-uri (if possibly-relative-base-uri
+                             (.resolve possibly-relative-base-uri possibly-relative-uri)
+                             possibly-relative-uri)
+              url          (io/resource (str relative-uri))]
+          (if url (str url)))))))
+
+(defn set-uri-resolver!
+  [^PdfRendererBuilder builder options]
+  (let [f (or (:uri-resolver options)
+              resolve-uri)]
+    (.useUriResolver builder (->uri-resolver f))))
 
 (defn append-style-tag!
   ^Element [^Element parent css-styles]
@@ -40,7 +75,7 @@
 
 (def default-options
   {:logging? false
-   :base-uri (get-base-resource-path-url)
+   :base-uri ""
    :styles   true
    :page     {:size        :letter
               :orientation :portrait
