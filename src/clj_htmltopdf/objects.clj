@@ -37,7 +37,12 @@
       (if (.hasAttribute element "id")
         (let [element-id (.getAttribute element "id")]
           (if-let [f (get-in options [:objects :by-id element-id])]
-            (->object-drawer-by-id f)))))))
+            (->object-drawer-by-id f)))))
+    (^boolean isReplacedObject [_ ^Element element]
+      ; TODO: is this the right thing to do based on how we're using this?
+      ;       see com.openhtmltopdf.render.DefaultObjectDrawerFactory ... registerDrawer() isn't part of the interface,
+      ;       so maybe we're good?
+      false)))
 
 (defn set-object-drawer-factory!
   [^PdfRendererBuilder builder options]
