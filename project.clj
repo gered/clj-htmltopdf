@@ -4,10 +4,10 @@
   :license        {:name "GNU Lesser General Public License v3.0"
                    :url  "https://www.gnu.org/licenses/lgpl.html"}
 
-  :dependencies   [[com.openhtmltopdf/openhtmltopdf-core "1.0.4"]
-                   [com.openhtmltopdf/openhtmltopdf-pdfbox "1.0.4"]
-                   [com.openhtmltopdf/openhtmltopdf-rtl-support "1.0.4"]
-                   [com.openhtmltopdf/openhtmltopdf-svg-support "1.0.4"]
+  :dependencies   [[com.openhtmltopdf/openhtmltopdf-core "1.0.5"]
+                   [com.openhtmltopdf/openhtmltopdf-pdfbox "1.0.5"]
+                   [com.openhtmltopdf/openhtmltopdf-rtl-support "1.0.5"]
+                   [com.openhtmltopdf/openhtmltopdf-svg-support "1.0.5"]
                    [org.jsoup/jsoup "1.12.1"]
                    [commons-io/commons-io "2.6"]
                    [hiccup "1.0.5"]]
