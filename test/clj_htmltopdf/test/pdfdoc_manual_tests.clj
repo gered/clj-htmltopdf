@@ -185,3 +185,21 @@
        :page   nil
        :debug  {:display-html?    true
                 :display-options? true}})))
+
+(comment
+  (let [filename           "test-custom-font.pdf"
+        relative-font-path "FirstTimeWriting-DOy8d.ttf"
+        absolute-font-path (str (io/resource relative-font-path))]
+    (println "\n **** " filename " **** \n")
+    (->pdf
+      [:div
+       [:h1 "Custom fonts!"]
+       [:p {:style "font-family: custom-font-relative"} "This should be styled in a custom font, specified via relative path!"]
+       [:p {:style "font-family: custom-font-absolute"} "This should also be styled with a custom font, but specified via an absolute path!"]]
+      filename
+      {:styles {:fonts [{:font-family "custom-font-relative"
+                         :src         relative-font-path}
+                        {:font-family "custom-font-absolute"
+                         :src         relative-font-path}]}
+       :debug  {:display-html?    true
+                :display-options? true}})))

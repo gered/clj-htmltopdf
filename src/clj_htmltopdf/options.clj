@@ -209,7 +209,8 @@
       (fn [{:keys [font-family src]}]
         ["@font-face"
          {:font-family font-family
-          :src         (str "url(\"" (utils/string->url-or-file src) "\")")}])
+          ; TODO: maybe should use whatever the current uri-resolver function is for this ?
+          :src         (str "url(\"" src #_(utils/string->url-or-file src) "\")")}])
       fonts)))
 
 (defn build-base-css-styles
