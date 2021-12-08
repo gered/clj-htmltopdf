@@ -116,7 +116,7 @@ When set to a map, the map should include CSS styles for the HTML `<body>` tag o
 default styles shown above. Two additional keys can be set in this map:
 
 * `:styles` a single file or vector of filenames pointing to any additional CSS stylesheets to be included.
-* `:fonts` a sequence of maps of the form `{:font-family "font-family-name-here" :src "/path/to/custom-font.ttf"}` which allows you to use custom fonts in other CSS style definitions using the `:font-family` name specified here.
+* `:fonts` a sequence of maps of the form `{:font-family "font-family-name-here" :src "file:/path/to/custom-font.ttf"}` which allows you to use custom fonts in other CSS style definitions using the `:font-family` name specified here. Note that to use a relative font path with `:src`, just drop the `file:` prefix and of course don't include a leading slash.
 
 If you want to include your own custom CSS styles without the base `htmltopdf-base.css` stylesheet being included nor
 any other base styles being injected, then you can specify either a single CSS filename or a vector of multiple CSS
