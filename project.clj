@@ -8,7 +8,7 @@
                    [com.openhtmltopdf/openhtmltopdf-pdfbox "1.0.10"]
                    [com.openhtmltopdf/openhtmltopdf-rtl-support "1.0.10"]
                    [com.openhtmltopdf/openhtmltopdf-svg-support "1.0.10"]
-                   [org.jsoup/jsoup "1.12.1"]
+                   [org.jsoup/jsoup "1.14.3"]
                    [commons-io/commons-io "2.6"]
                    [hiccup "1.0.5"]]
 
