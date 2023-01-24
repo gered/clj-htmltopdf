@@ -8,8 +8,8 @@
                    [com.openhtmltopdf/openhtmltopdf-pdfbox "1.0.10"]
                    [com.openhtmltopdf/openhtmltopdf-rtl-support "1.0.10"]
                    [com.openhtmltopdf/openhtmltopdf-svg-support "1.0.10"]
-                   [org.jsoup/jsoup "1.14.3"]
-                   [commons-io/commons-io "2.6"]
+                   [org.jsoup/jsoup "1.15.3"]
+                   [commons-io/commons-io "2.11.0"]
                    [hiccup "1.0.5"]]
 
   :resource-paths ["resources"]
