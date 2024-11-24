@@ -21,4 +21,17 @@
                    {:dependencies   [[pjstadig/humane-test-output "0.9.0"]]
                     :resource-paths ["test-resources"]
                     :injections     [(require 'pjstadig.humane-test-output)
-                                     (pjstadig.humane-test-output/activate!)]}})
+                                     (pjstadig.humane-test-output/activate!)]}}
+
+  :deploy-repositories [["releases" :clojars]
+                        ["snapshots" :clojars]]
+
+  :release-tasks       [["vcs" "assert-committed"]
+                        ["change" "version" "leiningen.release/bump-version" "release"]
+                        ["vcs" "commit"]
+                        ["vcs" "tag" "v" "--no-sign"]
+                        ["deploy"]
+                        ["change" "version" "leiningen.release/bump-version"]
+                        ["vcs" "commit" "bump to next snapshot version for future development"]
+                        ["vcs" "push"]]
+  )
