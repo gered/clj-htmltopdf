@@ -3,8 +3,9 @@
     [clojure.java.io :as io])
   (:import
     [java.io InputStream OutputStream]
+    [org.apache.pdfbox Loader]
     [org.apache.pdfbox.pdmodel PDDocument PDPage PDPageContentStream PDPageContentStream$AppendMode]
-    [org.apache.pdfbox.pdmodel.font PDType1Font PDFont]
+    [org.apache.pdfbox.pdmodel.font PDType1Font PDFont Standard14Fonts$FontName]
     [org.apache.pdfbox.pdmodel.graphics.image PDImageXObject]
     [org.apache.pdfbox.pdmodel.graphics.state PDExtendedGraphicsState]
     [org.apache.pdfbox.util Matrix]))
@@ -31,23 +32,23 @@
 ;       until something more comprehensive can be implemented such as allowing loading of external
 ;       TTF fonts via PDTrueTypeFont.loadTTF()
 (def watermark-fonts
-  {"times-roman"           PDType1Font/TIMES_ROMAN
-   "times-bold"            PDType1Font/TIMES_BOLD
-   "times-italic"          PDType1Font/TIMES_ITALIC
-   "times-bolditalic"      PDType1Font/TIMES_BOLD_ITALIC
-   "helvetica"             PDType1Font/HELVETICA
-   "helvetica-bold"        PDType1Font/HELVETICA_BOLD
-   "helvetica-oblique"     PDType1Font/HELVETICA_OBLIQUE
-   "helvetica-boldoblique" PDType1Font/HELVETICA_BOLD_OBLIQUE
-   "courier"               PDType1Font/COURIER
-   "courier-bold"          PDType1Font/COURIER_BOLD
-   "courier-oblique"       PDType1Font/COURIER_OBLIQUE
-   "courier-boldoblique"   PDType1Font/COURIER_BOLD_OBLIQUE})
+  {"times-roman"           Standard14Fonts$FontName/TIMES_ROMAN
+   "times-bold"            Standard14Fonts$FontName/TIMES_BOLD
+   "times-italic"          Standard14Fonts$FontName/TIMES_ITALIC
+   "times-bolditalic"      Standard14Fonts$FontName/TIMES_BOLD_ITALIC
+   "helvetica"             Standard14Fonts$FontName/HELVETICA
+   "helvetica-bold"        Standard14Fonts$FontName/HELVETICA_BOLD
+   "helvetica-oblique"     Standard14Fonts$FontName/HELVETICA_OBLIQUE
+   "helvetica-boldoblique" Standard14Fonts$FontName/HELVETICA_BOLD_OBLIQUE
+   "courier"               Standard14Fonts$FontName/COURIER
+   "courier-bold"          Standard14Fonts$FontName/COURIER_BOLD
+   "courier-oblique"       Standard14Fonts$FontName/COURIER_OBLIQUE
+   "courier-boldoblique"   Standard14Fonts$FontName/COURIER_BOLD_OBLIQUE})
 
 (defn render-text-watermark!
   [^PDDocument doc ^PDPage page ^PDPageContentStream cs options]
-  (let [font        (or (get watermark-fonts (:font options))
-                        (get watermark-fonts "helvetica-bold"))
+  (let [font        (PDType1Font. (or (get watermark-fonts (:font options))
+                                      (get watermark-fonts "helvetica-bold")))
         font-size   (float (or (:font-size options) 36.0))
         font-color  (or (:color options) [0 0 0])
         text        (:text options)
@@ -106,7 +107,7 @@
 
 (defn write-watermark!
   [^InputStream pdf ^OutputStream out {:keys [watermark] :as options}]
-  (with-open [doc (PDDocument/load pdf)]
+  (with-open [doc (Loader/loadPDF pdf)]
     (binding [*pdf-images* (atom {})]
       (doseq [^PDPage page (.getPages doc)]
         (let [cs (PDPageContentStream. doc page PDPageContentStream$AppendMode/APPEND true true)]

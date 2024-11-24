@@ -1,13 +1,13 @@
-(defproject clj-htmltopdf "0.2.1"
+(defproject clj-htmltopdf "0.2.2"
   :description    "Simple Clojure wrapper for Open HTML to PDF"
   :url            "https://github.com/gered/clj-htmltopdf"
   :license        {:name "GNU Lesser General Public License v3.0"
                    :url  "https://www.gnu.org/licenses/lgpl.html"}
 
-  :dependencies   [[com.openhtmltopdf/openhtmltopdf-core "1.0.10"]
-                   [com.openhtmltopdf/openhtmltopdf-pdfbox "1.0.10"]
-                   [com.openhtmltopdf/openhtmltopdf-rtl-support "1.0.10"]
-                   [com.openhtmltopdf/openhtmltopdf-svg-support "1.0.10"]
+  :dependencies   [[io.github.openhtmltopdf/openhtmltopdf-core "1.1.22"]
+                   [io.github.openhtmltopdf/openhtmltopdf-pdfbox "1.1.22"]
+                   [io.github.openhtmltopdf/openhtmltopdf-rtl-support "1.1.22"]
+                   [io.github.openhtmltopdf/openhtmltopdf-svg-support "1.1.22"]
                    [org.jsoup/jsoup "1.15.3"]
                    [commons-io/commons-io "2.11.0"]
                    [hiccup "1.0.5"]]
